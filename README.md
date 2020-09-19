@@ -1,6 +1,8 @@
 a lib for golang , generate mysql table schema to golang struct  
 -----
 mysql表结构自动生成golang struct  
+项目forkhttps://github.com/gohouse/converter 可以同时生成多个表的struct
+
 
 ## github地址
 [https://github.com/gohouse/converter](https://github.com/gohouse/converter)
@@ -71,6 +73,8 @@ func main() {
 	t2t := converter.NewTable2Struct()
 	// 个性化配置
 	t2t.Config(&converter.T2tConfig{
+        //结构体名是否按照驼峰命名
+		StructNameToHump: true,
 		// 如果字段首字母本来就是大写, 就不添加tag, 默认false添加, true不添加
 		RmTagIfUcFirsted: false,
 		// tag的字段名字是否转换为小写, 如果本身有大写字母的话, 默认false不转
@@ -83,7 +87,7 @@ func main() {
 	// 开始迁移转换
 	err := t2t.
 		// 指定某个表,如果不指定,则默认全部表都迁移
-		Table("user").
+		Table([]string{"user_demo", "user_extend"}).
 		// 表前缀
 		Prefix("prefix_").
 		// 是否添加json tag

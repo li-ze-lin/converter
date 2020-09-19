@@ -54,7 +54,7 @@ type Table2Struct struct {
 	dsn            string
 	savePath       string
 	db             *sql.DB
-	table          string
+	table          []string
 	prefix         string
 	config         *T2tConfig
 	err            error
@@ -108,7 +108,7 @@ func (t *Table2Struct) DB(d *sql.DB) *Table2Struct {
 	return t
 }
 
-func (t *Table2Struct) Table(tab string) *Table2Struct {
+func (t *Table2Struct) Table(tab []string) *Table2Struct {
 	t.table = tab
 	return t
 }
@@ -253,7 +253,7 @@ type column struct {
 }
 
 // Function for fetching schema definition of passed table
-func (t *Table2Struct) getColumns(table ...string) (tableColumns map[string][]column, err error) {
+func (t *Table2Struct) getColumns() (tableColumns map[string][]column, err error) {
 	// 根据设置,判断是否要把 date 相关字段替换为 string
 	if t.dateToTime == false {
 		typeForMysqlToGo["date"] = "string"
@@ -267,8 +267,13 @@ func (t *Table2Struct) getColumns(table ...string) (tableColumns map[string][]co
 		FROM information_schema.COLUMNS 
 		WHERE table_schema = DATABASE()`
 	// 是否指定了具体的table
-	if t.table != "" {
-		sqlStr += fmt.Sprintf(" AND TABLE_NAME = '%s'", t.prefix+t.table)
+	if stringsIsBlank(t.table) {
+		sqlStr += " AND TABLE_NAME in("
+		for _, value := range t.table {
+			sqlStr += fmt.Sprintf(" '%s',", t.prefix+value)
+		}
+		sqlStr = strings.TrimSuffix(sqlStr, ",")
+		sqlStr += ") "
 	}
 	// sql排序
 	sqlStr += " order by TABLE_NAME asc, ORDINAL_POSITION asc"
@@ -360,4 +365,17 @@ func (t *Table2Struct) camelCase(str string) string {
 }
 func tab(depth int) string {
 	return strings.Repeat("\t", depth)
+}
+
+func stringsIsBlank(s []string) bool {
+	if s == nil {
+		return false
+	}
+
+	for _, value := range s {
+		if value == "" {
+			return false
+		}
+	}
+	return true
 }
