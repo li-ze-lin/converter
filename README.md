@@ -1,8 +1,8 @@
 a lib for golang , generate mysql table schema to golang struct  
 -----
-mysql表结构自动生成golang struct  
-项目forkhttps://github.com/gohouse/converter 可以同时生成多个表的struct
+> 项目fork https://github.com/gohouse/converter 改造原来只能生成一张表的问题
 
+mysql表结构自动生成golang struct  
 
 ## github地址
 [https://github.com/gohouse/converter](https://github.com/gohouse/converter)
